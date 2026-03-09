@@ -1,0 +1,18 @@
+Analyse chip timing for my FPL team ahead of Gameweek {{gameweekId}}.
+
+AVAILABLE CHIPS:
+{{#chips}}
+- {{chipName}}: score {{score}}/10, current recommendation: {{recommendation}}
+  Rationale: {{rationale}}
+{{/chips}}
+
+DOUBLE GAMEWEEK DETECTED: {{hasDoubleGw}}
+UPCOMING FIXTURE SUMMARY:
+{{#fixtureDifficulty}}
+- {{teamName}}: avg FDR {{fdrScore}} over next 5 GWs
+{{/fixtureDifficulty}}
+
+Please provide:
+1. Whether to play any chip this gameweek and why
+2. Best upcoming window for each remaining chip
+3. Priority order if multiple chips are available

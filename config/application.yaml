@@ -1,0 +1,37 @@
+server:
+  port: 8080
+
+mongo:
+  uri: "mongodb://fpl:fpl_secret@localhost:27017/fpl_analytics?authSource=admin"
+  database: "fpl_analytics"
+
+kafka:
+  bootstrap: "localhost:9092"
+  consumer:
+    group: "fpl-analytics-consumers"
+    autoOffsetReset: "earliest"
+    enableAutoCommit: "true"
+  producer:
+    acks: "1"
+
+zipkin:
+  endpoint: "http://localhost:9411/api/v2/spans"
+  serviceName: "fpl-analytics"
+  samplingRate: 1.0
+
+ollama:
+  url: "http://localhost:11434"
+  model: "mistral:7b-instruct-v0.2"
+  temperature: 0.3
+  numPredict: 600
+
+fpl:
+  apiBase: "https://fantasy.premierleague.com/api"
+  rateLimitPerMinute: 60
+
+refresh:
+  bootstrapIntervalMs: 7200000
+  fixturesIntervalMs: 86400000
+  leagueStandingsIntervalMs: 1800000
+  liveScoresIntervalMs: 60000
+  analyticsCacheTtlMinutes: 15

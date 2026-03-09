@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FPL Analytics</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <!-- Chart.js for sparklines and rank charts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <header class="app-header">
+    <div class="logo">
+      <span class="logo-icon">⚽</span>
+      <span class="logo-text">FPL Analytics</span>
+    </div>
+    <nav class="tab-nav">
+      <button class="tab-btn active" data-tab="dashboard">Dashboard</button>
+      <button class="tab-btn" data-tab="analytics">Analytics</button>
+      <button class="tab-btn" data-tab="league">League</button>
+      <button class="tab-btn" data-tab="advice">AI Advice</button>
+    </nav>
+    <div class="user-setup">
+      <input type="number" id="inputUserId" placeholder="FPL User ID" />
+      <input type="number" id="inputLeagueId" placeholder="League ID" />
+      <button id="btnSaveIds" class="btn-primary">Save</button>
+    </div>
+  </header>
+
+  <main class="app-main">
+    <!-- Dashboard Tab -->
+    <div id="tab-dashboard" class="tab-content active">
+      <h2>Dashboard</h2>
+      <div class="status-cards">
+        <div class="card" id="card-health">
+          <div class="card-title">System Health</div>
+          <div class="card-value" id="health-status">Checking...</div>
+        </div>
+        <div class="card" id="card-gw">
+          <div class="card-title">Current Gameweek</div>
+          <div class="card-value" id="current-gw">—</div>
+        </div>
+        <div class="card" id="card-rank">
+          <div class="card-title">Overall Rank</div>
+          <div class="card-value" id="overall-rank">—</div>
+        </div>
+        <div class="card" id="card-points">
+          <div class="card-title">Total Points</div>
+          <div class="card-value" id="total-points">—</div>
+        </div>
+      </div>
+      <div class="action-bar">
+        <button class="btn-secondary" id="btn-refresh-bootstrap">Refresh Data</button>
+        <span id="refresh-status" class="status-text"></span>
+      </div>
+    </div>
+
+    <!-- Analytics Tab -->
+    <div id="tab-analytics" class="tab-content">
+      <h2>Analytics — GW <span id="analytics-gw">?</span></h2>
+
+      <section class="analytics-section">
+        <h3>Form Scores</h3>
+        <div id="form-table-container">
+          <table class="data-table" id="form-table">
+            <thead>
+              <tr>
+                <th>Player</th><th>Team</th><th>Form</th><th>Trend</th><th>Last 5 GWs</th>
+              </tr>
+            </thead>
+            <tbody id="form-tbody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="analytics-section">
+        <h3>Transfer Suggestions</h3>
+        <div id="transfers-container"></div>
+      </section>
+
+      <section class="analytics-section">
+        <h3>Chip Timing</h3>
+        <div id="chips-container" class="chip-cards"></div>
+      </section>
+
+      <section class="analytics-section">
+        <h3>Fixture Difficulty (Next 5 GWs)</h3>
+        <div id="fdr-container"></div>
+      </section>
+
+      <button class="btn-primary" id="btn-load-analytics">Load Analytics</button>
+    </div>
+
+    <!-- League Tab -->
+    <div id="tab-league" class="tab-content">
+      <h2>Mini-League</h2>
+      <div id="standings-container">
+        <table class="data-table" id="standings-table">
+          <thead>
+            <tr>
+              <th>Rank</th><th>Manager</th><th>Team</th><th>GW Pts</th><th>Total</th><th>+/-</th>
+            </tr>
+          </thead>
+          <tbody id="standings-tbody"></tbody>
+        </table>
+      </div>
+      <button class="btn-primary" id="btn-load-league">Load Standings</button>
+      <div id="rank-chart-container">
+        <canvas id="rankChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Advice Tab -->
+    <div id="tab-advice" class="tab-content">
+      <h2>AI Planning Advice</h2>
+      <div class="advice-controls">
+        <select id="advice-focus">
+          <option value="general">General Strategy</option>
+          <option value="transfers">Transfer Focus</option>
+          <option value="chips">Chip Timing Focus</option>
+        </select>
+        <input type="number" id="advice-gw" placeholder="Gameweek" />
+        <button class="btn-primary" id="btn-get-advice">Get AI Advice</button>
+      </div>
+      <div class="advice-output-wrapper">
+        <div id="advice-status" class="advice-status"></div>
+        <div id="advice-output" class="advice-text"></div>
+      </div>
+    </div>
+  </main>
+
+  <script src="/js/app.js"></script>
+  <script src="/js/analytics.js"></script>
+  <script src="/js/league.js"></script>
+  <script src="/js/advice.js"></script>
+</body>
+</html>

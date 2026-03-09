@@ -1,0 +1,19 @@
+Analyse my FPL team for Gameweek {{gameweekId}}.
+
+MY SQUAD FORM (descending):
+{{#formScores}}
+- {{webName}} ({{teamShortName}}): form {{formScore}}, trend {{trend}}, last 5 GWs: {{last5Points}}
+{{/formScores}}
+
+TOP TRANSFER SUGGESTIONS (EV-ranked):
+{{#transferSuggestions}}
+{{rank}}. OUT: {{transferOut.webName}} (form {{transferOut.formScore}}, FDR {{transferOut.fdrScore}}) → IN: {{transferIn.webName}} (form {{transferIn.formScore}}, FDR {{transferIn.fdrScore}}) | EV gain: +{{evGain}}
+{{/transferSuggestions}}
+
+BUDGET REMAINING: £{{bankInMillions}}m
+TRANSFERS AVAILABLE: {{transfersAvailable}} ({{transferCostNote}})
+
+Please provide:
+1. Your top transfer recommendation with clear rationale
+2. Captain pick for GW{{gameweekId}} with a backup option
+3. Any risk factors or players to watch
