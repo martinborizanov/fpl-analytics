@@ -103,7 +103,9 @@ public class TransferSuggestionService {
       parseDouble(player.getString("form", "0"));
 
     double fdr = fdrByTeam.getOrDefault(teamId, 3.0);
-    double minutesRisk = player.getInteger("chance_of_playing_next_round", 100) / 100.0;
+    // chance_of_playing_next_round is explicitly null in FPL API for fit players
+    Integer chanceRaw = player.getInteger("chance_of_playing_next_round");
+    double minutesRisk = (chanceRaw != null ? chanceRaw : 100) / 100.0;
 
     // EV = formScore × (6 - avgFDR) × minutesRisk
     // (6 - fdr) makes easy fixtures more valuable; fdr range is 2-5
@@ -112,7 +114,9 @@ public class TransferSuggestionService {
 
   private boolean isActive(JsonObject player) {
     String status = player.getString("status", "a");
-    int chanceOfPlaying = player.getInteger("chance_of_playing_next_round", 100);
+    // FPL API sets chance_of_playing_next_round to null for fully fit players
+    Integer chanceRaw = player.getInteger("chance_of_playing_next_round");
+    int chanceOfPlaying = chanceRaw != null ? chanceRaw : 100;
     return ("a".equals(status) || "d".equals(status)) && chanceOfPlaying > 25;
   }
 

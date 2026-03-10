@@ -130,13 +130,20 @@ public class AnalyticsVerticle extends AbstractVerticle {
       if (tid > 0) teamInfo.put(tid, t);
     });
 
-    // Current GW
+    // Current GW — prefer the event flagged is_current:true by the FPL API;
+    // fall back to minimum unfinished event if bootstrap hasn't been enriched yet.
     int currentGw = gwId > 0 ? gwId :
       events.stream()
         .map(o -> (JsonObject) o)
-        .filter(e -> !e.getBoolean("finished", false))
+        .filter(e -> Boolean.TRUE.equals(e.getBoolean("is_current")))
         .mapToInt(e -> e.getInteger("id", 0))
-        .min().orElse(1);
+        .findFirst()
+        .orElseGet(() ->
+          events.stream()
+            .map(o -> (JsonObject) o)
+            .filter(e -> !e.getBoolean("finished", false))
+            .mapToInt(e -> e.getInteger("id", 0))
+            .min().orElse(1));
 
     // Squad player IDs
     List<Integer> squadIds = new ArrayList<>();
