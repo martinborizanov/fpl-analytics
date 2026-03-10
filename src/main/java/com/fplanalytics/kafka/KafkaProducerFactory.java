@@ -20,6 +20,8 @@ public class KafkaProducerFactory {
     producerConfig.put("enable.idempotence", "false");
     producerConfig.put("retries", "3");
     producerConfig.put("max.block.ms", "10000");
+    producerConfig.put("max.request.size", "10485760");   // 10MB — matches broker KAFKA_MESSAGE_MAX_BYTES
+    producerConfig.put("buffer.memory", "33554432");      // 32MB send buffer
     return KafkaProducer.create(vertx, producerConfig);
   }
 }
