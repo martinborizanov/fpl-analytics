@@ -94,17 +94,22 @@ public class KafkaConsumerVerticle extends AbstractVerticle {
       JsonArray fixtures = new JsonArray(value);
       fixtures.forEach(o -> {
         JsonObject fixture = (JsonObject) o;
+        // Skip unscheduled fixtures (FPL returns null for event/team when not yet assigned)
+        Integer eventId = fixture.getInteger("event");
+        Integer homeTeamId = fixture.getInteger("team_h");
+        Integer awayTeamId = fixture.getInteger("team_a");
+        if (eventId == null || homeTeamId == null || awayTeamId == null) return;
         JsonObject filter = new JsonObject()
-          .put("eventId", fixture.getInteger("event"))
-          .put("homeTeamId", fixture.getInteger("team_h"))
-          .put("awayTeamId", fixture.getInteger("team_a"));
+          .put("eventId", eventId)
+          .put("homeTeamId", homeTeamId)
+          .put("awayTeamId", awayTeamId);
         JsonObject doc = new JsonObject()
-          .put("eventId", fixture.getInteger("event"))
-          .put("homeTeamId", fixture.getInteger("team_h"))
-          .put("awayTeamId", fixture.getInteger("team_a"))
+          .put("eventId", eventId)
+          .put("homeTeamId", homeTeamId)
+          .put("awayTeamId", awayTeamId)
           .put("kickoffTime", fixture.getString("kickoff_time"))
-          .put("teamHDifficulty", fixture.getInteger("team_h_difficulty"))
-          .put("teamADifficulty", fixture.getInteger("team_a_difficulty"))
+          .put("teamHDifficulty", fixture.getInteger("team_h_difficulty", 3))
+          .put("teamADifficulty", fixture.getInteger("team_a_difficulty", 3))
           .put("finished", fixture.getBoolean("finished", false));
         upsert(CollectionRegistry.FIXTURES, filter, doc);
       });

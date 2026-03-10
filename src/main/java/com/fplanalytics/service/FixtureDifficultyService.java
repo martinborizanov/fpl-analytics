@@ -37,15 +37,18 @@ public class FixtureDifficultyService {
       fd.setTeamShortName(info.getString("short_name", "???"));
 
       List<AnalyticsReport.FixtureDifficulty.FixtureEntry> upcoming = fixtures.stream()
+        .filter(f -> f.getInteger("eventId") != null
+                  && f.getInteger("homeTeamId") != null
+                  && f.getInteger("awayTeamId") != null)
         .filter(f -> {
           int gw = f.getInteger("eventId", 0);
           return gw > currentGw && gw <= currentGw + lookAheadGws
-            && (f.getInteger("homeTeamId") == teamId || f.getInteger("awayTeamId") == teamId);
+            && (teamId == f.getInteger("homeTeamId", 0) || teamId == f.getInteger("awayTeamId", 0));
         })
         .limit(lookAheadGws)
         .map(f -> {
-          boolean isHome = f.getInteger("homeTeamId") == teamId;
-          int opponentId = isHome ? f.getInteger("awayTeamId") : f.getInteger("homeTeamId");
+          boolean isHome = teamId == f.getInteger("homeTeamId", 0);
+          int opponentId = isHome ? f.getInteger("awayTeamId", 0) : f.getInteger("homeTeamId", 0);
           int difficulty = isHome ? f.getInteger("teamHDifficulty", 3) : f.getInteger("teamADifficulty", 3);
           JsonObject oppInfo = teamInfo.getOrDefault(opponentId, new JsonObject());
 

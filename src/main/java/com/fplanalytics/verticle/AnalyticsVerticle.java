@@ -7,23 +7,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fplanalytics.SharedContext;
 import com.fplanalytics.config.AppConfig;
-import com.fplanalytics.SharedContext;
 import com.fplanalytics.kafka.KafkaProducerFactory;
-import com.fplanalytics.SharedContext;
 import com.fplanalytics.kafka.TopicRegistry;
-import com.fplanalytics.SharedContext;
 import com.fplanalytics.model.AnalyticsReport;
-import com.fplanalytics.SharedContext;
 import com.fplanalytics.model.FormScore;
-import com.fplanalytics.SharedContext;
 import com.fplanalytics.mongo.CollectionRegistry;
-import com.fplanalytics.SharedContext;
 import com.fplanalytics.service.ChipTimingService;
-import com.fplanalytics.SharedContext;
 import com.fplanalytics.service.FixtureDifficultyService;
-import com.fplanalytics.SharedContext;
 import com.fplanalytics.service.FormScoreService;
-import com.fplanalytics.SharedContext;
 import com.fplanalytics.service.TransferSuggestionService;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
@@ -128,13 +119,15 @@ public class AnalyticsVerticle extends AbstractVerticle {
     Map<Integer, JsonObject> playerInfo = new HashMap<>();
     players.forEach(o -> {
       JsonObject p = (JsonObject) o;
-      playerInfo.put(p.getInteger("id"), p);
+      int pid = p.getInteger("id", -1);
+      if (pid > 0) playerInfo.put(pid, p);
     });
 
     Map<Integer, JsonObject> teamInfo = new HashMap<>();
     teams.forEach(o -> {
       JsonObject t = (JsonObject) o;
-      teamInfo.put(t.getInteger("id"), t);
+      int tid = t.getInteger("id", -1);
+      if (tid > 0) teamInfo.put(tid, t);
     });
 
     // Current GW
@@ -150,7 +143,10 @@ public class AnalyticsVerticle extends AbstractVerticle {
     if (teamPicks != null) {
       JsonObject raw = parseRaw(teamPicks);
       JsonArray picks = raw.getJsonArray("picks", new JsonArray());
-      picks.forEach(o -> squadIds.add(((JsonObject) o).getInteger("element")));
+      picks.forEach(o -> {
+        int el = ((JsonObject) o).getInteger("element", -1);
+        if (el > 0) squadIds.add(el);
+      });
     }
 
     // Form scores for squad players
@@ -166,13 +162,13 @@ public class AnalyticsVerticle extends AbstractVerticle {
     Map<Integer, Double> fdrByTeam = new HashMap<>();
     for (int teamId : squadTeamIds) {
       List<JsonObject> teamFixtures = fixtures.stream()
-        .filter(f -> f.getInteger("homeTeamId") == teamId || f.getInteger("awayTeamId") == teamId)
+        .filter(f -> teamId == f.getInteger("homeTeamId", 0) || teamId == f.getInteger("awayTeamId", 0))
         .filter(f -> f.getInteger("eventId", 0) > currentGw)
         .limit(5)
         .collect(Collectors.toList());
       double avgFdr = teamFixtures.isEmpty() ? 3.0 :
         teamFixtures.stream().mapToInt(f ->
-          f.getInteger("homeTeamId") == teamId
+          teamId == f.getInteger("homeTeamId", 0)
             ? f.getInteger("teamHDifficulty", 3)
             : f.getInteger("teamADifficulty", 3)
         ).average().orElse(3.0);
@@ -264,6 +260,9 @@ public class AnalyticsVerticle extends AbstractVerticle {
     // Simplified: check if any team appears twice in next 2 GWs
     Map<Integer, Long> teamCount = new HashMap<>();
     fixtures.stream()
+      .filter(f -> f.getInteger("eventId") != null
+               && f.getInteger("homeTeamId") != null
+               && f.getInteger("awayTeamId") != null)
       .filter(f -> {
         int gw = f.getInteger("eventId", 0);
         return gw > currentGw && gw <= currentGw + 2;
