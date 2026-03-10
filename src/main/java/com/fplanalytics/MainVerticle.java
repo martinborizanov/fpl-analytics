@@ -35,11 +35,9 @@ public class MainVerticle extends AbstractVerticle {
         Tracing tracing = TracingConfig.create(config);
         log.info("Zipkin tracing initialised → {}", config.getZipkin().getEndpoint());
 
-        // Store shared objects in vertx context so verticles can retrieve them
-        io.vertx.core.shareddata.LocalMap<String, Object> shared =
-          vertx.sharedData().getLocalMap("fpl.shared");
-        shared.put("config", config);
-        shared.put("tracing", tracing);
+        // Store shared objects in static context so all verticles can access them
+        SharedContext.setConfig(config);
+        SharedContext.setTracing(tracing);
 
         return deployAll(config);
       })
@@ -55,19 +53,21 @@ public class MainVerticle extends AbstractVerticle {
     return deploy(new MongoVerticle(), null)
       // 2. HttpServerVerticle
       .compose(v -> deploy(new HttpServerVerticle(), null))
-      // 3. FplApiClientVerticle — 2 worker instances
-      .compose(v -> deploy(new FplApiClientVerticle(),
+      // 3. FplApiClientVerticle — 2 worker instances (use class name for multi-instance)
+      .compose(v -> deployByClass(
+        "com.fplanalytics.verticle.FplApiClientVerticle",
         new DeploymentOptions().setWorker(true).setInstances(2)))
       // 4. DataRefreshVerticle — starts timers
       .compose(v -> deploy(new DataRefreshVerticle(), null))
-      // 5. KafkaConsumerVerticle — 2 worker instances
-      .compose(v -> deploy(new KafkaConsumerVerticle(),
+      // 5. KafkaConsumerVerticle — 2 worker instances (use class name for multi-instance)
+      .compose(v -> deployByClass(
+        "com.fplanalytics.verticle.KafkaConsumerVerticle",
         new DeploymentOptions().setWorker(true).setInstances(2)))
       // 6. AnalyticsVerticle
       .compose(v -> deploy(new AnalyticsVerticle(), null))
       // 7. OllamaVerticle — worker (LLM calls can be slow)
       .compose(v -> deploy(new OllamaVerticle(),
-        new DeploymentOptions().setWorker(true).setInstances(1)))
+        new DeploymentOptions().setWorker(true)))
       .mapEmpty();
   }
 
@@ -80,5 +80,12 @@ public class MainVerticle extends AbstractVerticle {
     return future
       .onSuccess(id -> log.info("{} deployed (id={})", name, id))
       .onFailure(err -> log.error("Failed to deploy {}", name, err));
+  }
+
+  private Future<String> deployByClass(String className, DeploymentOptions options) {
+    log.info("Deploying {} (×{})", className.substring(className.lastIndexOf('.') + 1), options.getInstances());
+    return vertx.deployVerticle(className, options)
+      .onSuccess(id -> log.info("{} deployed (id={})", className.substring(className.lastIndexOf('.') + 1), id))
+      .onFailure(err -> log.error("Failed to deploy {}", className, err));
   }
 }

@@ -3,9 +3,13 @@ package com.fplanalytics.verticle;
 import brave.Span;
 import brave.Tracer;
 import brave.Tracing;
+import com.fplanalytics.SharedContext;
 import com.fplanalytics.config.AppConfig;
+import com.fplanalytics.SharedContext;
 import com.fplanalytics.kafka.KafkaProducerFactory;
+import com.fplanalytics.SharedContext;
 import com.fplanalytics.kafka.TopicRegistry;
+import com.fplanalytics.SharedContext;
 import com.fplanalytics.mongo.CollectionRegistry;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Promise;
@@ -39,8 +43,8 @@ public class FplApiClientVerticle extends AbstractVerticle {
 
   @Override
   public void start(Promise<Void> startPromise) {
-    config = (AppConfig) vertx.sharedData().getLocalMap("fpl.shared").get("config");
-    Tracing tracing = (Tracing) vertx.sharedData().getLocalMap("fpl.shared").get("tracing");
+    config = SharedContext.getConfig();
+    Tracing tracing = SharedContext.getTracing();
     tracer = tracing.tracer();
 
     webClient = WebClient.create(vertx, new WebClientOptions()

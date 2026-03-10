@@ -1,6 +1,8 @@
 package com.fplanalytics.verticle;
 
+import com.fplanalytics.SharedContext;
 import com.fplanalytics.config.AppConfig;
+import com.fplanalytics.SharedContext;
 import com.fplanalytics.mongo.CollectionRegistry;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
@@ -32,7 +34,7 @@ public class MongoVerticle extends AbstractVerticle {
 
   @Override
   public void start(Promise<Void> startPromise) {
-    AppConfig config = (AppConfig) vertx.sharedData().getLocalMap("fpl.shared").get("config");
+    AppConfig config = SharedContext.getConfig();
 
     JsonObject mongoConfig = new JsonObject()
       .put("connection_string", config.getMongo().getUri())

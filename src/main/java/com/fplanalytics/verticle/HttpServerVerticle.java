@@ -1,8 +1,11 @@
 package com.fplanalytics.verticle;
 
 import brave.Tracing;
+import com.fplanalytics.SharedContext;
 import com.fplanalytics.config.AppConfig;
+import com.fplanalytics.SharedContext;
 import com.fplanalytics.handler.*;
+import com.fplanalytics.SharedContext;
 import com.fplanalytics.tracing.TracingHandler;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Promise;
@@ -25,8 +28,8 @@ public class HttpServerVerticle extends AbstractVerticle {
 
   @Override
   public void start(Promise<Void> startPromise) {
-    AppConfig config = (AppConfig) vertx.sharedData().getLocalMap("fpl.shared").get("config");
-    Tracing tracing = (Tracing) vertx.sharedData().getLocalMap("fpl.shared").get("tracing");
+    AppConfig config = SharedContext.getConfig();
+    Tracing tracing = SharedContext.getTracing();
 
     Router router = Router.router(vertx);
 

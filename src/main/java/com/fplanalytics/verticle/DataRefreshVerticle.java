@@ -1,5 +1,6 @@
 package com.fplanalytics.verticle;
 
+import com.fplanalytics.SharedContext;
 import com.fplanalytics.config.AppConfig;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Promise;
@@ -24,7 +25,7 @@ public class DataRefreshVerticle extends AbstractVerticle {
 
   @Override
   public void start(Promise<Void> startPromise) {
-    config = (AppConfig) vertx.sharedData().getLocalMap("fpl.shared").get("config");
+    config = SharedContext.getConfig();
 
     // Trigger an immediate refresh on startup
     triggerBootstrap();

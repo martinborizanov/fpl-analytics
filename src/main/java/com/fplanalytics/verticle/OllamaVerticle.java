@@ -5,10 +5,15 @@ import brave.Tracer;
 import brave.Tracing;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fplanalytics.SharedContext;
 import com.fplanalytics.config.AppConfig;
+import com.fplanalytics.SharedContext;
 import com.fplanalytics.kafka.KafkaProducerFactory;
+import com.fplanalytics.SharedContext;
 import com.fplanalytics.kafka.TopicRegistry;
+import com.fplanalytics.SharedContext;
 import com.fplanalytics.model.AnalyticsReport;
+import com.fplanalytics.SharedContext;
 import com.fplanalytics.service.OllamaPromptBuilder;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Promise;
@@ -45,8 +50,8 @@ public class OllamaVerticle extends AbstractVerticle {
 
   @Override
   public void start(Promise<Void> startPromise) {
-    config = (AppConfig) vertx.sharedData().getLocalMap("fpl.shared").get("config");
-    Tracing tracing = (Tracing) vertx.sharedData().getLocalMap("fpl.shared").get("tracing");
+    config = SharedContext.getConfig();
+    Tracing tracing = SharedContext.getTracing();
     tracer = tracing.tracer();
 
     String ollamaUrl = config.getOllama().getUrl();
