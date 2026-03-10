@@ -1,5 +1,7 @@
 package com.fplanalytics.model;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class TransferSuggestion {
 
   private PlayerRef transferOut;

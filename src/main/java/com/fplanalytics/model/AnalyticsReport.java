@@ -1,8 +1,10 @@
 package com.fplanalytics.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.time.Instant;
 import java.util.List;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class AnalyticsReport {
 
   private int userId;

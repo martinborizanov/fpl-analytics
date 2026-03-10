@@ -1,7 +1,9 @@
 package com.fplanalytics.model;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.util.List;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class FormScore {
   private int playerId;
   private String webName;
