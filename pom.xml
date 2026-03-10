@@ -37,6 +37,23 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
+      <!-- Pin all Jackson modules to the same version — Vert.x BOM pulls in 2.16.x
+           but jackson-databind 2.17.x requires jackson-core 2.17.x (NoSuchMethodError otherwise) -->
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-core</artifactId>
+        <version>${jackson.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-annotations</artifactId>
+        <version>${jackson.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-databind</artifactId>
+        <version>${jackson.version}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
