@@ -3,16 +3,16 @@ package com.fplanalytics.tracing;
 import brave.Span;
 import brave.Tracer;
 import brave.Tracing;
-import brave.propagation.TraceContext;
-import brave.propagation.TraceContextOrSamplingFlags;
 import io.vertx.core.Handler;
 import io.vertx.ext.web.RoutingContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Vert.x Web handler that starts a server span for every inbound HTTP request
- * and stores the active Span in the RoutingContext for downstream use.
+ * Vert.x Web handler that starts a server span for every inbound HTTP request.
+ * Stores the active Span in the RoutingContext under SPAN_KEY for downstream use.
+ *
+ * Note: B3 propagation header extraction uses Brave 6 API (TraceContext.Extractor).
  */
 public class TracingHandler implements Handler<RoutingContext> {
 
@@ -20,20 +20,21 @@ public class TracingHandler implements Handler<RoutingContext> {
   public static final String SPAN_KEY = "fpl.trace.span";
 
   private final Tracer tracer;
-  private final brave.propagation.Propagation.Getter<io.vertx.core.MultiMap, String> getter =
-    (carrier, key) -> carrier.get(key);
+  private final Tracing tracing;
 
   public TracingHandler(Tracing tracing) {
+    this.tracing = tracing;
     this.tracer = tracing.tracer();
   }
 
   @Override
   public void handle(RoutingContext ctx) {
     try {
-      brave.propagation.Extractor<io.vertx.core.MultiMap> extractor =
-        tracing().propagation().extractor(getter);
-
-      TraceContextOrSamplingFlags extracted = extractor.extract(ctx.request().headers());
+      // Extract B3 trace context from inbound HTTP headers (Brave 6 API)
+      brave.propagation.TraceContextOrSamplingFlags extracted =
+        tracing.propagation()
+          .<io.vertx.core.MultiMap>extractor((carrier, key) -> carrier.get(key))
+          .extract(ctx.request().headers());
 
       Span span = tracer.nextSpan(extracted)
         .name("http.server " + ctx.request().method().name() + " " + ctx.normalizedPath())
@@ -52,12 +53,8 @@ public class TracingHandler implements Handler<RoutingContext> {
         span.finish();
       });
     } catch (Exception e) {
-      log.warn("Failed to create trace span for request {}", ctx.request().path(), e);
+      log.warn("Failed to create trace span for {}", ctx.request().path(), e);
     }
     ctx.next();
-  }
-
-  private Tracing tracing() {
-    return Tracing.current();
   }
 }

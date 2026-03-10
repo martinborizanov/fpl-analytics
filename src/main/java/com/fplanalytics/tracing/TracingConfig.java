@@ -4,6 +4,7 @@ import brave.Tracing;
 import brave.sampler.Sampler;
 import com.fplanalytics.config.AppConfig;
 import zipkin2.reporter.AsyncReporter;
+import zipkin2.reporter.brave.ZipkinSpanHandler;
 import zipkin2.reporter.okhttp3.OkHttpSender;
 
 public class TracingConfig {
@@ -18,8 +19,8 @@ public class TracingConfig {
 
     return Tracing.newBuilder()
       .localServiceName(zipkinConfig.getServiceName())
-      .spanReporter(reporter)
-      .sampler(Sampler.create(zipkinConfig.getSamplingRate()))
+      .addSpanHandler(ZipkinSpanHandler.create(reporter))
+      .sampler(Sampler.create((float) zipkinConfig.getSamplingRate()))
       .build();
   }
 }

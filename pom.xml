@@ -92,6 +92,12 @@
       <artifactId>zipkin-sender-okhttp3</artifactId>
       <version>${zipkin.reporter.version}</version>
     </dependency>
+    <!-- Brave 6.x → Zipkin bridge (provides ZipkinSpanHandler) -->
+    <dependency>
+      <groupId>io.zipkin.reporter2</groupId>
+      <artifactId>zipkin-reporter-brave</artifactId>
+      <version>${zipkin.reporter.version}</version>
+    </dependency>
 
     <!-- ===== JSON ===== -->
     <dependency>

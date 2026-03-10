@@ -36,9 +36,10 @@ public class MainVerticle extends AbstractVerticle {
         log.info("Zipkin tracing initialised → {}", config.getZipkin().getEndpoint());
 
         // Store shared objects in vertx context so verticles can retrieve them
-        vertx.sharedData().getLocalMap("fpl.shared")
-          .put("config", config)
-          .put("tracing", tracing);
+        io.vertx.core.shareddata.LocalMap<String, Object> shared =
+          vertx.sharedData().getLocalMap("fpl.shared");
+        shared.put("config", config);
+        shared.put("tracing", tracing);
 
         return deployAll(config);
       })

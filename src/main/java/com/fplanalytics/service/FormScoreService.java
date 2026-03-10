@@ -36,7 +36,9 @@ public class FormScoreService {
       fs.setTeamShortName(info.getString("team_short_name", ""));
 
       if (history == null) {
-        fs.setFormScore(0);
+        // Fall back to the FPL API's own form field when no history doc is available
+        double fplForm = parseDouble(info.getString("form", "0"));
+        fs.setFormScore(fplForm);
         fs.setLast5Points(List.of());
         fs.setRollingAvg(0);
         fs.setTrend("STABLE");
